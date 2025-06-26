@@ -13,3 +13,61 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Visit {
+  id             String       @id @default(uuid())
+  firstName      String
+  lastName       String
+  email          String       @unique
+  phone          String       @unique
+  visitDate      DateTime     @default(now())
+  purpose        String
+  departmentId   String
+  department     Department   @relation(fields: [departmentId], references: [id])
+  receptionistId String
+  receptionist   Receptionist @relation(fields: [receptionistId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([visitDate])
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  visits       Visit[]
+  Receptionist Receptionist[]
+
+  @@index([name])
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([username])
+  @@index([email])
+}
+
+model Receptionist {
+  id           String     @id @default(uuid())
+  username     String     @unique
+  password     String
+  email        String     @unique
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  visits       Visit[]
+
+  @@index([username])
+  @@index([email])
+}
