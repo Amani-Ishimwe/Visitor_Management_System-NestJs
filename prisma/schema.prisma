@@ -15,19 +15,17 @@ datasource db {
 }
 
 model Visit {
-  id             String       @id @default(uuid())
-  firstName      String
-  lastName       String
-  email          String       @unique
-  phone          String       @unique
-  visitDate      DateTime     @default(now())
-  purpose        String
-  departmentId   String
-  department     Department   @relation(fields: [departmentId], references: [id])
-  receptionistId String
-  receptionist   Receptionist @relation(fields: [receptionistId], references: [id])
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id           String     @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String     @unique
+  phone        String     @unique
+  visitDate    DateTime   @default(now())
+  purpose      String
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   @@index([visitDate])
 }
@@ -39,35 +37,25 @@ model Department {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  visits       Visit[]
-  Receptionist Receptionist[]
+  visits Visit[]
 
   @@index([name])
 }
 
-model Admin {
+model User {
   id        String   @id @default(uuid())
-  username  String   @unique
-  password  String
+  firstName String
+  lastName  String
   email     String   @unique
+  password  String
+  role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([username])
   @@index([email])
 }
 
-model Receptionist {
-  id           String     @id @default(uuid())
-  username     String     @unique
-  password     String
-  email        String     @unique
-  departmentId String
-  department   Department @relation(fields: [departmentId], references: [id])
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  visits       Visit[]
-
-  @@index([username])
-  @@index([email])
+enum Role {
+  ADMIN
+  RECEPTIONIST
 }
