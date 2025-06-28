@@ -1,3 +1,6 @@
+
+import { EmailService } from './../email/email.service';
+
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -10,6 +13,7 @@ import { generateToken } from 'src/utils/jwtutil';
 export class UsersService {
     constructor(
       private readonly prismaService: DatabaseService,
+      private readonly emailService: EmailService
     ){}
 
 
@@ -34,7 +38,10 @@ export class UsersService {
                 role:createUserDto.role
             }
         })
-        return { user: savedUser };
+        const confirmUrl = `http://localhost:3000/api/v1/user/verify/${savedUser.id}/${savedUser.email}`;
+        await this.emailService.sendEmail(confirmUrl, savedUser);
+
+        return {user: savedUser}
     }
 
 
