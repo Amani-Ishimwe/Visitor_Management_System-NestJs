@@ -64,4 +64,7 @@ export class UsersService {
         const token = await generateToken(user.email, user.role, user.id)
         return { user, token }
     }
+
+
+    
 }

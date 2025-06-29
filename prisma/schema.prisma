@@ -50,6 +50,7 @@ model User {
   role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  profile   String   @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGDvVMnDeGLpVz-3WeVLdCxiYCU3-4MKt1RaTS2t_YTA&s")
 
   @@index([email])
 }

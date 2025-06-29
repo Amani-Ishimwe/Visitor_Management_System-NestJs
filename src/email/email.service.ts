@@ -19,7 +19,7 @@ export class EmailService {
             }
         })
     }
-    // Reset Password Email
+    // Reset Password Email 
     async resetPassword(email:string,user:User,otp:string){
         await this.emailService.sendMail({
             to:user.email,
