@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  RECEPTIONIST
+}
+
 model Visit {
   id           String     @id @default(uuid())
   firstName    String
@@ -55,7 +60,11 @@ model User {
   @@index([email])
 }
 
-enum Role {
-  ADMIN
-  RECEPTIONIST
+model OTP {
+  id        Int      @id @default(autoincrement())
+  otp       String
+  email     String
+  createdAt DateTime @default(now())
+
+  @@map("otp")
 }
