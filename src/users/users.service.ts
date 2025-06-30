@@ -1,7 +1,7 @@
 
 import { EmailService } from './../email/email.service';
 
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from 'generated/prisma';
@@ -9,6 +9,8 @@ import * as argon2 from 'argon2';
 import * as otpGen from 'otp-generator'
 import { generateToken } from 'src/utils/jwtutil';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
+
 
 
 @Injectable()
@@ -118,6 +120,47 @@ export class UsersService {
     }
     }
 
+    async resetPasswordEmail(
+    user: User,
+    passwords: ResetPasswordDto,
+  ): Promise<{ msg: string; loginUrl: string }> {
+    const available = await this.prismaService.user.findUnique({
+      where: { id: user.id, email: user.email },
+    });
+    //  check is user is truly him
+    if (!available)
+      throw new UnauthorizedException(
+        'please provide valid id and email you have received on email',
+      );
+
+    // check if passwords matches
+    if (!(passwords.password === passwords.confirmPassword))
+      throw new BadRequestException(' passwords are not match');
+    const hashedPassword = await argon2.hash(passwords.password);
+
+    //  check if  he provided already password  he use
+    const isCurrentPassword = await argon2.verify(
+      available.password,
+      passwords.password,
+    );
+    if (isCurrentPassword)
+      throw new BadRequestException(
+        'that is your current password, please choose another password',
+      );
+    await this.prismaService.user.update({
+      where: { id: user.id, email: user.email },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    // respond
+    return {
+      msg: 'to reset your password have been successfully , now you can  login with that password',
+      loginUrl: 'localhost:4000/api/v1/user/login',
+    };
+  }
+
     //verification of OTP
     async verifyOTP(
         otp:string,
@@ -162,4 +205,22 @@ export class UsersService {
       },
     });
     }
+
+
+    async remove(id:string){
+        const deletedUser = await this.prismaService.user.delete({
+            where:{
+               id
+            }
+        })
+          return {deletedUser}
+    }
+    getAccountDetails(user: User, id: string) {
+    if (id == null) throw new BadRequestException('please provide your id');
+    if (id !== user.id) throw new BadRequestException(' that is not your id ');
+    // return user
+    return { user };
+  }
+
 }
+
