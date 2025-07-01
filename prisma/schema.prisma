@@ -18,20 +18,42 @@ enum Role {
   RECEPTIONIST
 }
 
+enum VisitStatus {
+  ACTIVE
+  CHECKED_OUT
+  CANCELLED
+}
+
+
+
+model Visitor {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String   @unique
+  createdAt DateTime @default(now())
+
+  visits    Visit[]
+}
+
 model Visit {
-  id           String     @id @default(uuid())
-  firstName    String
-  lastName     String
-  email        String     @unique
-  phone        String     @unique
-  visitDate    DateTime   @default(now())
-  purpose      String
+  id           String       @id @default(uuid())
+  visitorId    String
   departmentId String
-  department   Department @relation(fields: [departmentId], references: [id])
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  purpose      String
+  visitDate    DateTime     @default(now())
+  entryTime    DateTime?
+  exitTime     DateTime?
+  status       VisitStatus  @default(ACTIVE)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  visitor      Visitor      @relation(fields: [visitorId], references: [id])
+  department   Department   @relation(fields: [departmentId], references: [id])
 
   @@index([visitDate])
+  @@index([status])
 }
 
 model Department {
@@ -41,21 +63,24 @@ model Department {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  visits Visit[]
+  visits      Visit[]
+  users       User[]
 
   @@index([name])
 }
 
 model User {
-  id        String   @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String   @unique
-  password  String
-  role      Role
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  profile   String   @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGDvVMnDeGLpVz-3WeVLdCxiYCU3-4MKt1RaTS2t_YTA&s")
+  id           String     @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String     @unique
+  password     String
+  role         Role
+  profile      String     @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGDvVMnDeGLpVz-3WeVLdCxiYCU3-4MKt1RaTS2t_YTA&s")
+  departmentId String?   //optional to receptionists
+  department   Department? @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   @@index([email])
 }

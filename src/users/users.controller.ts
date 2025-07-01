@@ -7,9 +7,10 @@ import { UsersService } from './users.service';
 import { User } from 'generated/prisma';
 import { GetUser } from 'src/decorator/getUser.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { RolesGuard } from './roles.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorator/roles.decorator';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @ApiTags('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -32,7 +33,7 @@ export class UsersController {
  //login
  @ApiOperation({ summary: 'Login a user' })
  @ApiResponse({ status: 200, description: 'User logged in successfully' })
- @ApiBody({ type: CreateUserDto })
+ @ApiBody({ type: LoginUserDto })
  @Post('login')
     login(@Body() createUserDto: CreateUserDto){
         return this.usersService.login(createUserDto)
