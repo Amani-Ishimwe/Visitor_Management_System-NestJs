@@ -5,8 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
-  "scripts": {
-    "build": "nest build",
+  "scripts": { 
+    "build": "nest build && npm run copy:templates",
+    "copy:templates": "xcopy src\\email\\templates dist\\email\\templates /E /I /Y",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

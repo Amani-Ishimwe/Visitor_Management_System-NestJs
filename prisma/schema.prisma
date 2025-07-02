@@ -24,8 +24,6 @@ enum VisitStatus {
   CANCELLED
 }
 
-
-
 model Visitor {
   id        String   @id @default(uuid())
   firstName String
@@ -34,23 +32,23 @@ model Visitor {
   phone     String   @unique
   createdAt DateTime @default(now())
 
-  visits    Visit[]
+  visits Visit[]
 }
 
 model Visit {
-  id           String       @id @default(uuid())
+  id           String      @id @default(uuid())
   visitorId    String
   departmentId String
   purpose      String
-  visitDate    DateTime     @default(now())
+  visitDate    DateTime    @default(now())
   entryTime    DateTime?
   exitTime     DateTime?
-  status       VisitStatus  @default(ACTIVE)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  status       VisitStatus @default(ACTIVE)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
-  visitor      Visitor      @relation(fields: [visitorId], references: [id])
-  department   Department   @relation(fields: [departmentId], references: [id])
+  visitor    Visitor    @relation(fields: [visitorId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
 
   @@index([visitDate])
   @@index([status])
@@ -63,24 +61,25 @@ model Department {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  visits      Visit[]
-  users       User[]
+  visits Visit[]
+  users  User[]
 
   @@index([name])
 }
 
 model User {
-  id           String     @id @default(uuid())
+  id           String      @id @default(uuid())
   firstName    String
   lastName     String
-  email        String     @unique
+  email        String      @unique
   password     String
   role         Role
-  profile      String     @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGDvVMnDeGLpVz-3WeVLdCxiYCU3-4MKt1RaTS2t_YTA&s")
-  departmentId String?   //optional to receptionists
+  profile      String      @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGDvVMnDeGLpVz-3WeVLdCxiYCU3-4MKt1RaTS2t_YTA&s")
+  departmentId String? //optional to receptionists
   department   Department? @relation(fields: [departmentId], references: [id])
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  verified     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   @@index([email])
 }

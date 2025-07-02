@@ -1,19 +1,21 @@
 
 
 import { ResetPasswordDto } from './dto/resetPassword.dto';
-import { Body, Controller, Get, Param, Patch, Post, UploadedFile, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { User } from 'generated/prisma';
 import { GetUser } from 'src/decorator/getUser.decorator';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiConsumes } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorator/roles.decorator';
 import { LoginUserDto } from './dto/login-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUploadDto } from './dto/file-upload-dto';
 
 @ApiTags('users')
-@UseGuards(JwtAuthGuard, RolesGuard)
+//@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
 export class UsersController {
     constructor(
@@ -21,7 +23,7 @@ export class UsersController {
     ){}
 
 //register
-@Roles('ADMIN')
+//@Roles('ADMIN')
 @ApiOperation({ summary: 'Register a new user' })
 @ApiResponse({ status: 201, description: 'User registered successfully' })
 @ApiBody({ type: CreateUserDto })
@@ -38,18 +40,33 @@ export class UsersController {
     login(@Body() createUserDto: CreateUserDto){
         return this.usersService.login(createUserDto)
     }
-@Roles('RECEPTIONIST')
-@ApiOperation({ summary: 'Update user profile' })
-@ApiResponse({ status: 200, description: 'User profile updated successfully' })
-@ApiParam({ name: 'id', description: 'User ID' })
-@Patch('fill/profile/:id')
-update(
-    @GetUser() user:User,
-    @UploadedFile() file:Express.Multer.File,
-    @Param('id') userId: string
 
-):Promise<User>{
-    return this.usersService.update(userId,user,file)
+    //verification of user
+@ApiOperation({ summary: 'Verify user email' })
+@ApiResponse({ status: 200, description: 'User verified successfully' })
+@ApiParam({ name: 'id', description: 'User ID' })
+@ApiParam({ name: 'email', description: 'User email' })
+@Get('verify/:id/:email')
+async verifyUser(
+  @Param('id') id: string,
+  @Param('email') email: string,
+) {
+  return this.usersService.verifyUser(id, email);
+}
+
+
+@UseGuards(JwtAuthGuard)
+@Roles('RECEPTIONIST')
+@ApiConsumes('multipart/form-data')
+@ApiBody({ type: FileUploadDto })
+@Patch('fill/profile/:id')
+@UseInterceptors(FileInterceptor('file'))
+update(
+  @GetUser() user: User,
+  @UploadedFile() file: Express.Multer.File,
+  @Param('id') userId: string
+): Promise<User> {
+  return this.usersService.update(userId, user, file);
 }
 
 
@@ -72,6 +89,8 @@ resetPasswordRequest(@Param('email') email:string){
 verifyOTP(@Param('email') email: string,@Param('otp') otp:string){
     return this.usersService.verifyOTP(otp, email)
 }
+
+@UseGuards(JwtAuthGuard)
 @ApiOperation({ summary: 'Reset password with new credentials' })
 @ApiResponse({ status: 200, description: 'Password reset successfully' })
 @ApiBody({ type: ResetPasswordDto })

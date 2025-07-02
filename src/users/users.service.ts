@@ -43,7 +43,7 @@ export class UsersService {
                 role:createUserDto.role
             }
         })
-        const confirmUrl = `http://localhost:3000/api/v1/user/verify/${savedUser.id}/${savedUser.email}`;
+        const confirmUrl = `http://localhost:3000/users/verify/${savedUser.id}/${savedUser.email}`;
         await this.emailService.sendEmail(confirmUrl, savedUser);
 
         return {user: savedUser}
@@ -69,6 +69,31 @@ export class UsersService {
         const token = await generateToken(user.email, user.role, user.id)
         return { user, token }
     }
+
+    //verification of user
+async verifyUser(id: string, email: string): Promise<{ message: string }> {
+  // Find user by id and email
+  const user = await this.prismaService.user.findUnique({
+    where: { id },
+  });
+
+  if (!user || user.email !== email) {
+    throw new BadRequestException('Invalid verification link or user not found.');
+  }
+
+  if (user.verified) {
+    return { message: 'User already verified.' };
+  }
+
+
+  // Mark user as verified
+  await this.prismaService.user.update({
+    where: { id },
+    data: { verified: true },
+  });
+
+  return { message: 'User verified successfully.' };
+}
     
     //update profile
     async update(
@@ -157,7 +182,7 @@ export class UsersService {
     // respond
     return {
       msg: 'to reset your password have been successfully , now you can  login with that password',
-      loginUrl: 'localhost:4000/api/v1/user/login',
+      loginUrl: 'localhost:3000/users/login',
     };
   }
 
