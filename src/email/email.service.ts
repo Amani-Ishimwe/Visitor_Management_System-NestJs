@@ -1,5 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { Visitor } from '@prisma/client';
 import { User } from 'generated/prisma';
 
 @Injectable()
@@ -28,6 +29,18 @@ export class EmailService {
             context:{
                 name: user.firstName,
                 otp: otp
+            }
+        })
+    }
+
+    async sendId(email:string, visitor:Visitor, id:string){
+        await this.emailService.sendMail({
+            to:visitor.email,
+            subject:"ID Delivery",
+            template:"./sendId",
+            context:{
+                name:visitor.firstName,
+                id:id
             }
         })
     }

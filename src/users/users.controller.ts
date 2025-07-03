@@ -102,7 +102,5 @@ verifyOTP(@Param('email') email: string,@Param('otp') otp:string){
     return this.usersService.resetPasswordEmail(user, passwords);
   }
 
-  
-
 }
 

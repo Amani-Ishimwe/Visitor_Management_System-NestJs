@@ -6,6 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { EmailModule } from './email/email.module';
 import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { VisitorsModule } from './visitors/visitors.module';
 
 
 @Module({
@@ -13,7 +14,8 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     ConfigModule.forRoot({
       isGlobal:true
     }),
-    CloudinaryModule
+    CloudinaryModule,
+    VisitorsModule
   ],
   controllers: [AppController],
   providers: [AppService],
