@@ -1,6 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { Visitor } from '@prisma/client';
+import { Department, Visitor } from '@prisma/client';
 import { User } from 'generated/prisma';
 
 @Injectable()
@@ -44,4 +44,16 @@ export class EmailService {
             }
         })
     }
+    async sendIdDepartment(email:string, department:Department, id:string){
+        await this.emailService.sendMail({
+            to:department.email,
+            subject:"ID Delivery",
+            template:"./sendId",
+            context:{
+                name:department.name,
+                id:id
+            }
+        })
+    }
+
 }

@@ -31,12 +31,15 @@ async create(createVisitDto: CreateVisitDto) {
 
 
   findAll() {
-    return this.prismaService.visit.findMany();
+    return this.prismaService.visit.findMany({
+      include: { visitor: true, department: true }
+    });
   }
 
   findOne(id: string) {
     return this.prismaService.visit.findUnique({
-      where:{id}
+      where: { id },
+      include: { visitor: true, department: true }
     });
   }
 

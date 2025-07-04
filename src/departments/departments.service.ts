@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { DatabaseService } from 'src/database/database.service';
+import { Department } from '@prisma/client';
 
 @Injectable()
 export class DepartmentsService {
@@ -10,22 +11,25 @@ export class DepartmentsService {
     private readonly prismaService:DatabaseService,
     private readonly EmailService:EmailService
   ){}
- async create(createDepartmentDto: CreateDepartmentDto) {
+ async create(createDepartmentDto: CreateDepartmentDto):Promise<{department:Department}> {
     const savedDepartment = await this.prismaService.department.create({
        data: createDepartmentDto 
     })
    
-    await this.EmailService.sendId(savedDepartment.email,savedDepartment,savedDepartment.id)
-    return {createDepartmentDto:savedDepartment}
+    await this.EmailService.sendIdDepartment(savedDepartment.email,savedDepartment,savedDepartment.id)
+    return {department:savedDepartment}
   }
 
   findAll() {
-    return this.prismaService.department.findMany();
+    return this.prismaService.department.findMany({
+      include: { visits: true, users: true },
+    });
   }
 
   findOne(id: string) {
     return this.prismaService.department.findUnique({
-      where:{id}
+      where:{id},
+      include: { visits: true, users: true },
     });
   }
 
@@ -42,3 +46,6 @@ export class DepartmentsService {
     });
   }
 }
+
+
+
