@@ -20,27 +20,37 @@ export class DepartmentsService {
     return {department:savedDepartment}
   }
 
-  findAll() {
-    return this.prismaService.department.findMany({
-      include: { visits: true, users: true },
-    });
+   async findAll(page = 1, limit = 10): Promise<{ data: Department[]; total: number }> {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prismaService.department.findMany({
+        skip,
+        take: limit,
+        include: { visits: true, users: true },
+        orderBy: { createdAt: 'desc' }, 
+      }),
+      this.prismaService.department.count(),
+    ]);
+
+    return { data, total };
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     return this.prismaService.department.findUnique({
       where:{id},
       include: { visits: true, users: true },
     });
   }
 
-  update(id: string, updateDepartmentDto: UpdateDepartmentDto) {
+  async update(id: string, updateDepartmentDto: UpdateDepartmentDto) {
     return this.prismaService.department.update({
       where:{id},
       data:updateDepartmentDto
     });
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     return this.prismaService.department.delete({
       where:{id}
     });

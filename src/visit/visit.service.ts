@@ -30,27 +30,41 @@ async create(createVisitDto: CreateVisitDto) {
 }
 
 
-  findAll() {
-    return this.prismaService.visit.findMany({
-      include: { visitor: true, department: true }
-    });
+async findAll(page = 1, limit = 10): Promise<{ data: any[]; total: number }> {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prismaService.visit.findMany({
+        skip,
+        take: limit,
+        include: {
+          visitor: true,
+          department: true,
+        },
+        orderBy: { entryTime: 'desc' },
+      }),
+      this.prismaService.visit.count(),
+    ]);
+
+    return { data, total };
   }
 
-  findOne(id: string) {
+
+  async findOne(id: string) {
     return this.prismaService.visit.findUnique({
       where: { id },
       include: { visitor: true, department: true }
     });
   }
 
-  update(id: string, updateVisitDto: UpdateVisitDto) {
+  async update(id: string, updateVisitDto: UpdateVisitDto) {
     return this.prismaService.visit.update({
       where:{id},
       data:updateVisitDto
     });
   }
 
-  remove(id: string) {
+ async remove(id: string) {
     return this.prismaService.visit.delete({
       where:{id}
     });

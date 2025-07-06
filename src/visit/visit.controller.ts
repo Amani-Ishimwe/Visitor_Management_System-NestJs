@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { VisitService } from './visit.service';
 import { CreateVisitDto } from './dto/create-visit.dto';
 import { UpdateVisitDto } from './dto/update-visit.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/decorator/roles.decorator';
 
@@ -22,13 +22,18 @@ export class VisitController {
     return this.visitService.create(createVisitDto);
   }
 
-  @Get()
-  @Roles('RECEPTIONIST')
-  @ApiOperation({summary:"Get All Visits"})
-  @ApiResponse({status:200, description:"All Visits Retrieved Successfully"})
-  findAll() {
-    return this.visitService.findAll();
-  }
+@Get()
+@Roles('RECEPTIONIST')
+@ApiOperation({ summary: 'Get All Visits (Paginated)' })
+@ApiResponse({ status: 200, description: 'All Visits Retrieved Successfully' })
+@ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
+@ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10)' })
+findAll(
+  @Query('page') page = 1,
+  @Query('limit') limit = 10
+) {
+  return this.visitService.findAll(Number(page), Number(limit));
+}
 
   @Get(':id')
   @Roles('RECEPTIONIST')

@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from 'src/decorator/roles.decorator';
 
@@ -22,13 +22,15 @@ export class DepartmentsController {
     return this.departmentsService.create(createDepartmentDto);
   }
 
-  @Get()
-  @Roles('ADMIN')
-  @ApiOperation({summary:"Fetching all the departments"})
-  @ApiResponse({status:200, description:"Fetched all departments successfully"})
-  findAll() {
-    return this.departmentsService.findAll();
-  }
+@Get()
+@Roles('ADMIN')
+@ApiOperation({ summary: 'Fetching all the departments (paginated)' })
+@ApiResponse({ status: 200, description: 'Fetched all departments successfully' })
+@ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
+@ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10)' })
+findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+  return this.departmentsService.findAll(Number(page), Number(limit));
+}
 
   @Get(':id')
   @Roles('ADMIN')

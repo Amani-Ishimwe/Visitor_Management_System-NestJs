@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { VisitorsService } from './visitors.service';
 import { CreateVisitorDto } from './dto/create-visitor.dto';
 import { UpdateVisitorDto } from './dto/update-visitor.dto';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 
 @ApiTags('Visitors')
@@ -19,12 +19,17 @@ export class VisitorsController {
     return this.visitorsService.create(createVisitorDto);
   }
 
-  @Get()
-  @ApiOperation({summary:"Fetches all Visitors"})
-  @ApiResponse({status:200,description:"All Visitors have been fetched"})
-  findAll() {
-    return this.visitorsService.findAll();
-  }
+@Get()
+@ApiOperation({ summary: 'Fetches all Visitors with pagination' })
+@ApiResponse({ status: 200, description: 'Visitors have been fetched successfully' })
+@ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
+@ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10)' })
+findAll(
+  @Query('page') page = 1,
+  @Query('limit') limit = 10
+) {
+  return this.visitorsService.findAll(Number(page), Number(limit));
+}
 
   @Get(':id')
   @ApiOperation({summary:"Get Visitor By Id"})
