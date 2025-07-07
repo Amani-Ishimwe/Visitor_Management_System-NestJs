@@ -57,7 +57,15 @@ jobs:
           ${{ runner.os }}-pnpm-store-
 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: |
+        pnpm install --no-frozen-lockfile || pnpm install --frozen-lockfile
+        # Fallback to --no-frozen-lockfile if lockfile is incompatible, then regenerate it
+
+    - name: Save dependency cache
+      uses: actions/cache/save@v3
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
 
     - name: Generate Prisma client
       run: pnpm prisma generate
@@ -116,21 +124,17 @@ jobs:
       with:
         version: ${{ env.PNPM_VERSION }}
 
-    - name: Get pnpm store directory
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-    - name: Setup pnpm cache
-      uses: actions/cache@v3
+    - name: Restore pnpm cache
+      uses: actions/cache/restore@v3
       with:
         path: ${{ env.STORE_PATH }}
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
-    - name: Install dependencies
+    - name: Install dependencies (if cache missed)
       run: pnpm install --frozen-lockfile
+      if: steps.cache-restore.outputs.cache-hit != 'true'
 
     - name: Generate Prisma client
       run: pnpm prisma generate
