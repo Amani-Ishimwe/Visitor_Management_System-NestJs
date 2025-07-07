@@ -12,17 +12,17 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
   imports:[
     ConfigModule,
     MailerModule.forRootAsync({
-      useFactory: async(config:ConfigService) =>({
+      useFactory: (config: ConfigService) => ({
        transport:{
-        host:config.get('MAIL_HOST'),
+        host:config.get<string>('MAIL_HOST'),
         secure:false,
         auth:{
-          user:config.get('SMTP_USERNAME'),
-          pass:config.get('SMTP_PASSWORD')
+          user:config.get<string>('SMTP_USERNAME'),
+          pass:config.get<string>('SMTP_PASSWORD')
         }
        },
        defaults: {
-        from:`"VMS" <${config.get('SMTP_USERNAME')}>`
+        from:`"VMS" <${config.get<string>('SMTP_USERNAME')}>`
        },
        template:{
         dir: join(__dirname,'templates'),
