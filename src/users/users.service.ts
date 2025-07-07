@@ -1,3 +1,4 @@
+
 import { EmailService } from './../email/email.service';
 
 import { BadRequestException, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
@@ -96,21 +97,22 @@ async verifyUser(id: string, email: string): Promise<{ message: string }> {
     
     //update profile
     async update(
-        id: string,
-        user: User,
+        id:string,
+        user:User,
         file: Express.Multer.File
-    ): Promise<User> {
+    ){
         const uploadResult = await this.cloudinaryService.uploadFile(
             file,
             user.email.replace('@gmail.com','')
         );
+        
         const updateUser = await this.prismaService.user.update({
             where: {id : id.trim() },
             data:{
                 profile:uploadResult.secure_url,
             },
         })
-        return updateUser;
+    return updateUser
     }
     //send reset password request
     async resetPasswordRequest(email: string){
