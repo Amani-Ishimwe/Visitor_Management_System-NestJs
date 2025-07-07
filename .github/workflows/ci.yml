@@ -58,17 +58,21 @@ jobs:
 
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
+      working-directory: Visitor_Management_System-NestJs
 
     - name: Generate Prisma client
       run: pnpm prisma generate
+      working-directory: Visitor_Management_System-NestJs
 
     - name: Run database migrations
       run: pnpm prisma migrate deploy
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vms_test
+      working-directory: Visitor_Management_System-NestJs
 
     - name: Run linting
       run: pnpm run lint
+      working-directory: Visitor_Management_System-NestJs
 
     - name: Run tests
       run: pnpm run test
@@ -82,7 +86,7 @@ jobs:
         EMAIL_PORT: 587
         EMAIL_USER: test@example.com
         EMAIL_PASS: test
-
+      working-directory: Visitor_Management_System-NestJs
     - name: Run E2E tests
       run: pnpm run test:e2e
       env:
@@ -95,7 +99,7 @@ jobs:
         EMAIL_PORT: 587
         EMAIL_USER: test@example.com
         EMAIL_PASS: test
-
+      working-directory: Visitor_Management_System-NestJs
   build:
     name: Build
     runs-on: ubuntu-latest
