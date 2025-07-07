@@ -5,9 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
-  "scripts": { 
+  "scripts": {
     "build": "nest build && npm run copy:templates",
-    "copy:templates": "xcopy src\\email\\templates dist\\email\\templates /E /I /Y",
+    "copy:templates": "cpx \"src/email/templates/**/*\" dist/email/templates",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -55,6 +55,7 @@
     "@types/multer": "^1.4.13",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
+    "cpx": "^1.5.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
