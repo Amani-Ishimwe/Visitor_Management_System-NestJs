@@ -13,8 +13,8 @@ export class CloudinaryService {
         return new Promise<CloudinaryResponse>((resolve, reject) =>{
             const uploadStream = cloudinary.uploader.upload_stream(
                 {folder:'Vms_Profile', public_id:fileName},
-                (err, result)=>{
-                    if(err) return reject(err);
+                (err: Error | undefined, result: CloudinaryResponse | undefined) =>{
+                    if(err) return reject(new Error(err.message));
                     if (!result) return reject(new Error('No result from Cloudinary'));
                     resolve(result);
                 },

@@ -16,7 +16,7 @@ export class JwtAuthGuard implements CanActivate {
     const token = authHeader.split(' ')[1];
     if (!token) throw new UnauthorizedException('Invalid token format');
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload: { [key: string]: any } = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get('JWT_SECRET'),
       });
       request.user = payload;
