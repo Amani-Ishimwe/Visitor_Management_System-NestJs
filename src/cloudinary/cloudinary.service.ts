@@ -19,10 +19,7 @@ export class CloudinaryService {
                     resolve(result);
                 },
             );
-
-            //convert file to buffer
             streamifier.createReadStream(file.buffer).pipe(uploadStream)
         })
-    }
-    
+    } 
 }

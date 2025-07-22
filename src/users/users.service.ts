@@ -1,6 +1,5 @@
 
 import { EmailService } from './../email/email.service';
-
 import { BadRequestException, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
