@@ -44,6 +44,7 @@ export class EmailService {
             }
         })
     }
+    //sending id  confirmation to department
     async sendIdDepartment(email:string, department:Department, id:string){
         await this.emailService.sendMail({
             to:department.email,
