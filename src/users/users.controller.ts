@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { User } from 'generated/prisma';
 import { GetUser } from 'src/decorator/getUser.decorator';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiConsumes } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiConsumes, ApiGatewayTimeoutResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorator/roles.decorator';
@@ -61,12 +61,16 @@ async verifyUser(
 @ApiBody({ type: FileUploadDto })
 @Patch('fill/profile/:id')
 @UseInterceptors(FileInterceptor('file'))
-update(
+async update(
   @GetUser() user: User,
   @UploadedFile() file: Express.Multer.File,
   @Param('id') userId: string
 ): Promise<User> {
-  return this.usersService.update(userId, user, file);
+  const fullUser = await this.usersService.findUserById(userId)
+  if (!fullUser) {
+    throw new Error('User not found');
+  }
+  return this.usersService.update(userId, fullUser, file);
 }
 
 
@@ -95,11 +99,15 @@ verifyOTP(@Param('email') email: string,@Param('otp') otp:string){
 @ApiResponse({ status: 200, description: 'Password reset successfully' })
 @ApiBody({ type: ResetPasswordDto })
 @Patch('/reset/newPasswords')
-  resetPassword(
+async resetPassword(
     @GetUser() user: User,
     @Body() passwords: ResetPasswordDto,
   ): Promise<{ msg: string; loginUrl: string }> {
-    return this.usersService.resetPasswordEmail(user, passwords);
+    const fullUser = await this.usersService.findUserById(user.id)
+    if (!fullUser) {
+    throw new Error('User not found');
+  }
+    return this.usersService.resetPasswordEmail(fullUser, passwords);
   }
 
 }

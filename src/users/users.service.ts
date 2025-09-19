@@ -3,7 +3,7 @@ import { EmailService } from './../email/email.service';
 import { BadRequestException, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from 'generated/prisma';
+import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import * as otpGen from 'otp-generator'
 import { generateToken } from 'src/utils/jwtutil';
@@ -230,6 +230,17 @@ async verifyUser(id: string, email: string): Promise<{ message: string }> {
     });
     }
 
+    async findUserById(id: string){
+      const user = await this.prismaService.user.findUnique({
+        where: { id }
+      })
+      if(!user){
+        throw new Error("User Not Found")
+      }
+      return this.prismaService.user.findUnique({
+        where: {id}
+      })
+    }
 
     async remove(id:string){
         const deletedUser = await this.prismaService.user.delete({
