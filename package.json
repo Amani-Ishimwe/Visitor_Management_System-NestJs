@@ -33,6 +33,7 @@
     "argon2": "^0.43.0",
     "class-validator": "^0.14.2",
     "cloudinary": "^2.7.0",
+    "dotenv": "^17.2.2",
     "multer": "^2.0.1",
     "nodemailer": "^7.0.3",
     "otp-generator": "^4.0.1",
