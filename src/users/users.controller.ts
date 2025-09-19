@@ -4,7 +4,7 @@ import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { Body, Controller, Get, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
-import { User } from 'generated/prisma';
+import { User } from '@prisma/client';
 import { GetUser } from 'src/decorator/getUser.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiConsumes, ApiGatewayTimeoutResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
