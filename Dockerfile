@@ -40,7 +40,6 @@ RUN pnpm install --prod --frozen-lockfile
 
 # Copy built files and Prisma client
 COPY --from=build --chown=nestjs:nodejs /app/dist ./dist
-COPY --from=build --chown=nestjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build --chown=nestjs:nodejs /app/prisma ./prisma
 
 # Copy email templates
