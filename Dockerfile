@@ -25,29 +25,38 @@ RUN pnpm run build
 # ---------- Production Stage ----------
 FROM node:18-alpine AS production
 
+# Install pnpm
 RUN npm install -g pnpm
 
+# Create non-root user
 RUN addgroup -g 1001 -S nodejs \
-  && adduser -S nestjs -u 1001
+    && adduser -S nestjs -u 1001
 
 WORKDIR /app
 
-# Install only production dependencies
+# Copy package files and install only production dependencies
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 
-# ⬅️ Generate the Prisma client in this final container
+# Copy Prisma schema before generating client
+COPY --from=build /app/prisma ./prisma
+
+# Generate Prisma client in production
 RUN npx prisma generate
 
-# Copy compiled files and schema
+# Copy built NestJS app and templates
 COPY --from=build --chown=nestjs:nodejs /app/dist ./dist
-COPY --from=build --chown=nestjs:nodejs /app/prisma ./prisma
 COPY --from=build --chown=nestjs:nodejs /app/src/email/templates ./dist/email/templates
 
+# Use non-root user
 USER nestjs
+
+# Expose app port
 EXPOSE 3000
 
+# Healthcheck
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD node healthcheck.js
 
-CMD ["node","dist/main"]
+# Start the app
+CMD ["node", "dist/main"]
